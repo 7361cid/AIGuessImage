@@ -10,12 +10,10 @@ print('Y_train: ' + str(train_y.shape))
 print('X_test:  ' + str(test_X.shape))
 print('Y_test:  ' + str(test_y.shape))
 
-flat_x = np.hstack(train_X[0])
-print(flat_x.shape)
-
+""" Network Parameters """
 num_labels = 10
-hidden_size = batch_size = 10
-
+batch_size = 10
+hidden_size = 50
 iter = 5
 
 
@@ -61,7 +59,6 @@ class Net:
 
 images = train_X[0:1000].reshape(1000, 28 * 28) / 255  # на 10К ОШИБКИ
 labels = train_y[0:1000]
-print(f"images [0] {images[0]} \n {type(images[0])}")
 new_labels = np.zeros((len(labels), 10))
 
 for i, j in enumerate(labels):
@@ -86,39 +83,31 @@ for i in range(iter):   # Network learn
             diff = labels_for_batch - predict
             net_obj.change_weights(diff, input_data)
 
-    print(f"LOG iter{i}  error {error}  correct_count {correct_count}  all_count {all_count}")
+    print(f"Network learn progress iter{i}  error {error}  correct_count {correct_count}  all_count {all_count}")
 
 
 if __name__ == "__main__":
     images_test = test_X[0:10].reshape(10, 28 * 28) / 255  # проверить на train
     labels_test = test_y[0:10]
-    new_labels_test = np.zeros((len(labels_test), 10))
-    for i, j in enumerate(labels_test):
-        new_labels_test[i][j] = 1
-    labels_test = new_labels
 
     correct_count_test = 0
-    all_count_test = 0
-    # for i in range(len(images_test)):
-
     data_from_lib = images_test[0]
     predict = net_obj.feedforfard(data_from_lib, axis=0)
-    image_test = img_from_array(test_X[0])  # исп test_X а не images_test из-за размерности
-    image_test.save(f"image_test{0}.jpg")
 
     for i in range(10):
         img_path = fr"C:\Users\chern\PycharmProjects\jsPractice\net\image_test{i}.jpg"
         array_from_img = img_to_array(img_path)
 
-        recovery_img = img_from_array(array_from_img)
-        recovery_img.convert('RGB').save(fr"C:\Users\chern\PycharmProjects\jsPractice\net\image_test_recovery{i}.jpg")
+        img_from_array(test_X[i]).save(f"images_for_tests/image_test{i}.jpg")
 
         data_from_img = array_from_img.reshape(1, 28 * 28) / 255
         predict = net_obj.feedforfard(data_from_img[0], axis=0)
         predic_result = np.argmax(predict)
-        print(f"predic_result from img {predic_result} - {np.argmax(labels_test[i])}")
-
-    for i in range(1, 4):
-        img_path = fr"C:\Users\chern\PycharmProjects\jsPractice\net\images\number_{i}.jpg"
-        predic_result = net_obj.predict_img_by_path(path=img_path)
-        print(f"predic_result from custom img {predic_result} - {i}")
+        if predic_result == labels_test[i]:
+            correct_count_test += 1
+        print(f"predic_result from img {predic_result} - {labels_test[i]}")
+    print(f"TEST RESULT {correct_count_test} from 10  iter {iter}")
+    # FOR 1 layer, 5 iter, train_X[0:1000]  7/10  6/10 8/10 6/10 7/10
+    # FOR 1 layer, 10 iter, train_X[0:1000]  8/10  7/10 7/10 8/10 8/10
+    # FOR 1 layer, 15 iter, train_X[0:1000]  8/10  8/10 8/10 8/10 8/10
+    
